@@ -19,6 +19,9 @@ from weasyprint import HTML
 from pdf2image import convert_from_path
 from webdriver_manager.chrome import ChromeDriverManager
 
+from dotenv import load_dotenv
+load_dotenv()
+
 app = Flask(__name__)
 
 # 設定 LINE Channel Access Token 和 Channel Secret
@@ -206,7 +209,7 @@ def handle_message(event):
     elif message_text == "時刻表":
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="您要查詢哪個站点的時刻表？\n1. 二坪\n2. 八甲\n3. 火車站")
+            TextSendMessage(text="您要查詢哪個站點的時刻表？\n1. 二坪\n2. 八甲\n3. 火車站")
         )
     elif message_text in timetable_images:
         line_bot_api.reply_message(
