@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookHandler
@@ -99,7 +100,7 @@ def handle_message(event):
         login_data = {
             "txtAccount": account,
             "txtPassword": password,
-            "txtVerifyCode": pytesseract.image_to_string(captcha_image)  # 使用 OCR 识别验证码
+            "txtVerifyCode": os.environ.get("CAPTCHA_CODE")  # 使用環境變數
         }
         login_response = requests.post(login_url, data=login_data)
 
@@ -139,15 +140,18 @@ def handle_message(event):
                 EC.presence_of_element_located((By.CSS_SELECTOR, "table.gridtable"))
             )
 
-            # 擷取表格元素的螢幕截圖
-            table_element = driver.find_element(By.CSS_SELECTOR, "table.gridtable")
-            table_element.screenshot("timetable.png")
+            # 擷取表格元素的 HTML 代码
+            table_html = driver.find_element(By.CSS_SELECTOR, "table.gridtable").get_attribute('outerHTML')
 
             # 關閉 WebDriver
             driver.quit()
 
-            # 將 PDF 轉換為圖片 (所有頁面)
-            images = convert_from_path("timetable.png")
+            # 使用 weasyprint 直接將 HTML 转换为 PDF
+            html = HTML(string=table_html)
+            html.write_pdf("timetable.pdf")
+
+            # 将 PDF 转化为图片
+            images = convert_from_path("timetable.pdf")
 
             # 逐頁儲存圖片
             for i, image in enumerate(images):
@@ -228,4 +232,4 @@ def handle_message(event):
         )
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True) 
