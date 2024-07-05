@@ -99,7 +99,7 @@ def handle_message(event):
         login_data = {
             "txtAccount": account,
             "txtPassword": password,
-            "txtVerifyCode": input("請輸入驗證碼: ")
+            "txtVerifyCode": pytesseract.image_to_string(captcha_image)  # 使用 OCR 识别验证码
         }
         login_response = requests.post(login_url, data=login_data)
 
