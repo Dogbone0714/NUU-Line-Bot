@@ -17,4 +17,4 @@ Flask
 Werkzeug
 line-bot-sdk
 pytesseract
-
+selenium
