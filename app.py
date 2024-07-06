@@ -109,61 +109,61 @@ def handle_message(event):
             user_id,
             TextSendMessage(text="請輸入您的校務系統帳號和密碼，以空格分隔。")
         )
-    elif message_text.count(" ") == 1:
-        # 處理帳號和密碼輸入
-        account, password = message_text.split(" ")
-        user_data[user_id] = {"account": account, "password": password}
+elif message_text.count(" ") == 1:
+    # 處理帳號和密碼輸入
+    account, password = message_text.split(" ")
+    user_data[user_id] = {"account": account, "password": password}
 
-        # 要求使用者輸入验证码
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="請輸入您看到的驗證碼:")
-        )
-        elif user_id in user_data:
-            if 'captcha_code' in user_data[user_id]:
-                captcha_code = user_data[user_id]['captcha_code']
-                # 使用帳號密碼登入校務系統
-                login_url = "https://eap10.nuu.edu.tw/Login.aspx?logintype=S"
-                login_data = {
-                    "txtAccount": user_data[user_id]["account"],
-                    "txtPassword": user_data[user_id]["password"],
-                    "txtVerifyCode": captcha_code
-                }
-                try:
-                    login_response = requests.post(login_url, data=login_data)
-                    if login_response.status_code == 200:
-                        # 登入成功，處理後續操作
-                        print("登入成功！")
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            TextSendMessage(text="登入成功！")
-                        )
-                    else:
-                        # 登入失敗，處理後續操作
-                        print("登入失敗！")
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            TextSendMessage(text="登入失敗，請檢查您的帳號密碼或验证码。")
-                        )
-                except Exception as e:
-                    print(f"登入錯誤: {e}")
+    # 要求使用者輸入验证码
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="請輸入您看到的驗證碼:")
+    )
+    elif user_id in user_data:
+        if 'captcha_code' in user_data[user_id]:
+            captcha_code = user_data[user_id]['captcha_code']
+            # 使用帳號密碼登入校務系統
+            login_url = "https://eap10.nuu.edu.tw/Login.aspx?logintype=S"
+            login_data = {
+                "txtAccount": user_data[user_id]["account"],
+                "txtPassword": user_data[user_id]["password"],
+                "txtVerifyCode": captcha_code
+            }
+            try:
+                login_response = requests.post(login_url, data=login_data)
+                if login_response.status_code == 200:
+                    # 登入成功，處理後續操作
+                    print("登入成功！")
                     line_bot_api.reply_message(
                         event.reply_token,
-                        TextSendMessage(text="登入錯誤，請稍后再試。")
+                        TextSendMessage(text="登入成功！")
                     )
-            else:
+                else:
+                    # 登入失敗，處理後續操作
+                    print("登入失敗！")
+                    line_bot_api.reply_message(
+                        event.reply_token,
+                        TextSendMessage(text="登入失敗，請檢查您的帳號密碼或验证码。")
+                    )
+            except Exception as e:
+                print(f"登入錯誤: {e}")
                 line_bot_api.reply_message(
                     event.reply_token,
-                    TextSendMessage(text="請輸入您看到的驗證碼:")
+                    TextSendMessage(text="登入錯誤，請稍后再試。")
                 )
         else:
-            # 处理其他情况
-            print("其他情况")
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text="請輸入 \"登入\" 開始登入校務系統。")
+                TextSendMessage(text="請輸入您看到的驗證碼:")
             )
-                    )
+    else:
+        # 处理其他情况
+        print("其他情况")
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="請輸入 \"登入\" 開始登入校務系統。")
+        )
+                )
 
     # Skill 2: 查詢課表
     elif message_text == "查詢課表":
