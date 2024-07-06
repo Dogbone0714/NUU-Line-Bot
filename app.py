@@ -13,6 +13,7 @@ import cv2
 import requests
 from PIL import Image
 import pytesseract
+import numpy as np
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
