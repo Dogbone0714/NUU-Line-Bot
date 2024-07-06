@@ -65,118 +65,118 @@ def handle_message(event):
     user_id = event.source.user_id
     message_text = event.message.text
 
-# Skill 1: 登入校務系統
-if message_text == "登入" or (user_id not in user_data):
-    # 請求驗證碼圖片
-    captcha_url = "https://eap10.nuu.edu.tw/CommonPages/Captcha.aspx"
-    response = requests.get(captcha_url)
+    # Skill 1: 登入校務系統
+    if message_text == "登入" or (user_id not in user_data):
+        # 請求驗證碼圖片
+        captcha_url = "https://eap10.nuu.edu.tw/CommonPages/Captcha.aspx"
+        response = requests.get(captcha_url)
 
-    if response.status_code == 200:
-        # 使用 OpenCV 读取图片
-        captcha_image = cv2.imdecode(np.frombuffer(response.content, np.uint8), cv2.IMREAD_COLOR)
+        if response.status_code == 200:
+            # 使用 OpenCV 读取图片
+            captcha_image = cv2.imdecode(np.frombuffer(response.content, np.uint8), cv2.IMREAD_COLOR)
 
-        # 使用 pytesseract 识别验证码
-        try:
-            captcha_text = pytesseract.image_to_string(captcha_image)
-            print(f"验证码: {captcha_text}")
-        except Exception as e:
-            print(f"Error recognizing captcha: {e}")
-            captcha_text = "识别失败，请手动输入"  # 识别失败，提示用户手动输入
+            # 使用 pytesseract 识别验证码
+            try:
+                captcha_text = pytesseract.image_to_string(captcha_image)
+                print(f"验证码: {captcha_text}")
+            except Exception as e:
+                print(f"Error recognizing captcha: {e}")
+                captcha_text = "识别失败，请手动输入"  # 识别失败，提示用户手动输入
 
-        # 将图片数据转换为 base64 编码
-        _, encoded_image = cv2.imencode(".png", captcha_image)
-        base64_image = encoded_image.tobytes().encode("base64").decode("utf-8")
+            # 将图片数据转换为 base64 编码
+            _, encoded_image = cv2.imencode(".png", captcha_image)
+            base64_image = encoded_image.tobytes().encode("base64").decode("utf-8")
 
-        # 构建图片 URL
-        image_url = f"data:image/png;base64,{base64_image}"
+            # 构建图片 URL
+            image_url = f"data:image/png;base64,{base64_image}"
 
-        # 傳送驗證碼圖片和文字給使用者
-        line_bot_api.reply_message(
-            event.reply_token,
-            [
-                ImageSendMessage(
-                    original_content_url=image_url,  # 使用 base64 编码的图片 URL
-                    preview_image_url=image_url
-                ),
-                TextSendMessage(text=f"驗證碼: {captcha_text}")
-            ]
-        )
-    else:
-        # 处理获取验证码图片失败的情况
-        print(f"Error fetching captcha image: {response.status_code}")
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="获取验证码图片失败，请稍后再试。")
-        )
-
-        # 要求使用者輸入帳號和密碼
-        line_bot_api.reply_message(
-            event.reply_token,
-            TemplateSendMessage(
-                alt_text='請輸入您的校務系統帳號和密碼',
-                template=ButtonsTemplate(
-                    title='登入校務系統',
-                    text='請輸入您的校務系統帳號和密碼',
-                    actions=[
-                        MessageTemplateAction(label='輸入帳號密碼', text='輸入帳號密碼')
-                    ]
-                )
-            )
-        )
-elif message_text.count(" ") == 1:  # 缩进与前面的 `else` 保持一致
-    # 處理帳號和密碼輸入
-    account, password = message_text.split(" ")
-    user_data[user_id] = {"account": account, "password": password}
-
-    # 要求使用者輸入验证码
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="請輸入您看到的驗證碼:")
-    )
-elif user_id in user_data:  # 缩进与前面的 `elif` 保持一致
-    if 'captcha_code' in user_data[user_id]:
-        captcha_code = user_data[user_id]['captcha_code']
-        # 使用帳號密碼登入校務系統
-        login_url = "https://eap10.nuu.edu.tw/Login.aspx?logintype=S"
-        login_data = {
-            "txtAccount": user_data[user_id]["account"],
-            "txtPassword": user_data[user_id]["password"],
-            "txtVerifyCode": captcha_code
-        }
-        try:
-            login_response = requests.post(login_url, data=login_data)
-            if login_response.status_code == 200:
-                # 登入成功，處理後續操作
-                print("登入成功！")
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage(text="登入成功！")
-                )
-            else:
-                # 登入失敗，處理後續操作
-                print("登入失敗！")
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage(text="登入失敗，請檢查您的帳號密碼或验证码。")
-                )
-        except Exception as e:
-            print(f"登入錯誤: {e}")
+            # 傳送驗證碼圖片和文字給使用者
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text="登入錯誤，請稍后再試。")
+                [
+                    ImageSendMessage(
+                        original_content_url=image_url,  # 使用 base64 编码的图片 URL
+                        preview_image_url=image_url
+                    ),
+                    TextSendMessage(text=f"驗證碼: {captcha_text}")
+                ]
             )
-    else:
+        else:
+            # 处理获取验证码图片失败的情况
+            print(f"Error fetching captcha image: {response.status_code}")
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="获取验证码图片失败，请稍后再试。")
+            )
+
+            # 要求使用者輸入帳號和密碼
+            line_bot_api.reply_message(
+                event.reply_token,
+                TemplateSendMessage(
+                    alt_text='請輸入您的校務系統帳號和密碼',
+                    template=ButtonsTemplate(
+                        title='登入校務系統',
+                        text='請輸入您的校務系統帳號和密碼',
+                        actions=[
+                            MessageTemplateAction(label='輸入帳號密碼', text='輸入帳號密碼')
+                        ]
+                    )
+                )
+            )
+    elif message_text.count(" ") == 1:  # 缩进与前面的 `else` 保持一致
+        # 處理帳號和密碼輸入
+        account, password = message_text.split(" ")
+        user_data[user_id] = {"account": account, "password": password}
+
+        # 要求使用者輸入验证码
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="請輸入您看到的驗證碼:")
         )
-else:
-    # 处理其他情况
-    print("其他情况")
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="請輸入 \"登入\" 開始登入校務系統。")
-    )
+    elif user_id in user_data:  # 缩进与前面的 `elif` 保持一致
+        if 'captcha_code' in user_data[user_id]:
+            captcha_code = user_data[user_id]['captcha_code']
+            # 使用帳號密碼登入校務系統
+            login_url = "https://eap10.nuu.edu.tw/Login.aspx?logintype=S"
+            login_data = {
+                "txtAccount": user_data[user_id]["account"],
+                "txtPassword": user_data[user_id]["password"],
+                "txtVerifyCode": captcha_code
+            }
+            try:
+                login_response = requests.post(login_url, data=login_data)
+                if login_response.status_code == 200:
+                    # 登入成功，處理後續操作
+                    print("登入成功！")
+                    line_bot_api.reply_message(
+                        event.reply_token,
+                        TextSendMessage(text="登入成功！")
+                    )
+                else:
+                    # 登入失敗，處理後續操作
+                    print("登入失敗！")
+                    line_bot_api.reply_message(
+                        event.reply_token,
+                        TextSendMessage(text="登入失敗，請檢查您的帳號密碼或验证码。")
+                    )
+            except Exception as e:
+                print(f"登入錯誤: {e}")
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="登入錯誤，請稍后再試。")
+                )
+        else:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="請輸入您看到的驗證碼:")
+            )
+    else:
+        # 处理其他情况
+        print("其他情况")
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="請輸入 \"登入\" 開始登入校務系統。")
+        )
 
     # Skill 2: 查詢課表
     elif message_text == "查詢課表":
