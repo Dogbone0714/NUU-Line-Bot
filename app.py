@@ -71,11 +71,14 @@ def handle_message(event):
         captcha_url = "https://eap10.nuu.edu.tw/CommonPages/Captcha.aspx"
         captcha_response = requests.get(captcha_url)
 
-    # 使用 OpenCV 读取图片
+        # 使用 OpenCV 读取图片
         captcha_image = cv2.imdecode(np.frombuffer(captcha_response.content, np.uint8), cv2.IMREAD_COLOR)
 
-    # 使用影像辨識轉換驗證碼
-        captcha_text = pytesseract.image_to_string(captcha_image)
+        # 保存图片为 PNG 格式
+        cv2.imwrite("captcha.png", captcha_image)
+
+        # 使用 pytesseract 识别验证码
+        captcha_text = pytesseract.image_to_string(cv2.imread("captcha.png"))
 
     # 傳送驗證碼圖片和文字給使用者
         line_bot_api.reply_message(
