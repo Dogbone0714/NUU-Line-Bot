@@ -16,3 +16,6 @@ zopfli==0.2.3
 Flask
 Werkzeug
 line-bot-sdk
+pytesseract
+tesseract-ocr
+tesseract
