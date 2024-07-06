@@ -67,26 +67,26 @@ def handle_message(event):
     # Skill 1: 登入校務系統
     if message_text == "登入" or (user_id not in user_data):
     # 請求驗證碼圖片
-    captcha_url = "https://eap10.nuu.edu.tw/CommonPages/Captcha.aspx"
-    captcha_response = requests.get(captcha_url)
+        captcha_url = "https://eap10.nuu.edu.tw/CommonPages/Captcha.aspx"
+        captcha_response = requests.get(captcha_url)
 
     # 使用 OpenCV 读取图片
-    captcha_image = cv2.imdecode(np.frombuffer(captcha_response.content, np.uint8), cv2.IMREAD_COLOR)
+        captcha_image = cv2.imdecode(np.frombuffer(captcha_response.content, np.uint8), cv2.IMREAD_COLOR)
 
     # 使用影像辨識轉換驗證碼
-    captcha_text = pytesseract.image_to_string(captcha_image)
+        captcha_text = pytesseract.image_to_string(captcha_image)
 
     # 傳送驗證碼圖片和文字給使用者
-    line_bot_api.reply_message(
-        event.reply_token,
-        [
-            ImageSendMessage(
-                original_content_url=captcha_url,
-                preview_image_url=captcha_url
-            ),
-            TextSendMessage(text=f"驗證碼: {captcha_text}")
-        ]
-    )
+        line_bot_api.reply_message(
+            event.reply_token,
+            [
+                ImageSendMessage(
+                    original_content_url=captcha_url,
+                    preview_image_url=captcha_url
+                ),
+                TextSendMessage(text=f"驗證碼: {captcha_text}")
+            ]
+        )
 
         # 要求使用者輸入帳號和密碼
         line_bot_api.push_message(
