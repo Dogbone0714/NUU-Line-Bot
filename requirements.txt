@@ -21,4 +21,4 @@ selenium
 weasyprint
 pdf2image
 webdriver-manager
-opencv
+opencv-contrib-python
