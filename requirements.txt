@@ -17,5 +17,4 @@ Flask
 Werkzeug
 line-bot-sdk
 pytesseract
-tesseract-ocr
-tesseract
+
