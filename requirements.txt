@@ -18,3 +18,6 @@ Werkzeug
 line-bot-sdk
 pytesseract
 selenium
+weasyprint
+pdf2image
+webdriver-manager
