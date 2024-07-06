@@ -10,7 +10,6 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
 )
 import requests
-from .werkzeug.urls import url_quote 
 from PIL import Image
 import pytesseract
 from selenium import webdriver
