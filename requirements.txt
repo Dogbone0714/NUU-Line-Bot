@@ -15,4 +15,4 @@ webencodings==0.5.1
 zopfli==0.2.3
 Flask
 Werkzeug
-linebot==2.0.0
+line-bot-sdk
