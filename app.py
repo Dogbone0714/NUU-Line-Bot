@@ -78,7 +78,7 @@ def handle_message(event):
 
                 if captcha_image is not None:
                     # 检查图片类型
-                    print(f"图片类型: {type(captcha_image)}")
+                    print(f"圖片類型: {type(captcha_image)}")
 
                     # 将图片保存为 PNG 格式，确保 pytesseract 可以识别
                     cv2.imwrite("captcha.png", captcha_image)
@@ -86,7 +86,7 @@ def handle_message(event):
                     # 使用 pytesseract 识别验证码
                     try:
                         captcha_text = pytesseract.image_to_string(cv2.imread("captcha.png"))
-                        print(f"验证码: {captcha_text}")
+                        print(f"驗證碼: {captcha_text}")
                     except Exception as e:
                         print(f"Error recognizing captcha: {e}")
                         captcha_text = "识别失败，请手动输入"  # 识别失败，提示用户手动输入
