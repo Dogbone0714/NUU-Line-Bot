@@ -121,8 +121,8 @@ def handle_message(event):
 
             # 要求使用者輸入帳號和密碼
             line_bot_api.reply_message(
-                event.reply_token,  # 使用 event.reply_token 属性
-                TextSendMessage(text="請輸入您的校務系統帳號和密碼，以空格分隔：") 
+                event.reply_token,
+                TextSendMessage(text="請輸入您的校務系統帳號和密碼，以空格分隔：")
             )
     elif message_text.count(" ") == 1:
         # 處理帳號和密碼輸入
@@ -279,11 +279,11 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text="以下是可使用的指令：\n1. 時刻表\n2. 歷年成績查詢\n3. 查詢課表\n4. 登入")
         )
-    else:
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="請輸入正確的指令。")
-        )
+##   else:
+##        line_bot_api.reply_message(
+##            event.reply_token,
+##            TextSendMessage(text="請輸入正確的指令。")
+##        )  
 
 if __name__ == "__main__":
     app.run(debug=True)
