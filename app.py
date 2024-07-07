@@ -66,7 +66,7 @@ def handle_message(event):
     message_text = event.message.text  # 在这里定义 message_text 变量
 
     # Skill 1: 登入校務系統
-    if message_text == "登入" or (user_id not in user_data):
+    if message_text == "登入":
         # 請求驗證碼圖片
         captcha_url = "https://eap10.nuu.edu.tw/CommonPages/Captcha.aspx"
         response = requests.get(captcha_url)
@@ -190,7 +190,7 @@ def handle_message(event):
             )
 
     # Skill 2: 查詢課表
-    if message_text == "查詢課表":
+    elif message_text == "查詢課表":
         # 取得使用者帳號和密碼
         account = user_data.get(user_id, {}).get("account")
         password = user_data.get(user_id, {}).get("password")
@@ -243,7 +243,7 @@ def handle_message(event):
             )
 
     # Skill 3: 歷年成績查詢
-    if message_text == "歷年成績查詢":
+    elif message_text == "歷年成績查詢":
         # 取得使用者帳號和密碼
         account = user_data.get(user_id, {}).get("account")
         password = user_data.get(user_id, {}).get("password")
@@ -283,7 +283,7 @@ def handle_message(event):
                 TextSendMessage(text="您尚未登入，請先輸入「登入」指令。")
             )
     # Skill 4: 傳送公車時刻表
-    if message_text == "時刻表":
+    elif message_text == "時刻表":
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="您要查詢哪個站點的時刻表？\n1. 二坪\n2. 八甲\n3. 火車站")
@@ -298,7 +298,7 @@ def handle_message(event):
         )
 
     # Skill 5: 指令查詢
-    if message_text == "指令查詢":
+    elif message_text == "指令查詢":
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="以下是可使用的指令：\n1. 時刻表\n2. 歷年成績查詢\n3. 查詢課表\n4. 登入")
