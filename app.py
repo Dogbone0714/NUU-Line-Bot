@@ -63,7 +63,7 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_id = event.source.user_id
-    message_text = event.message.text  # 在这里定义 message_text 变量
+    message_text = event.message.text
 
     # Skill 1: 登入校務系統
     if message_text == "登入":
@@ -119,76 +119,52 @@ def handle_message(event):
             print(f"Error fetching captcha image: {response.status_code}")
             # 处理网络请求失败的情况
 
-
             # 要求使用者輸入帳號和密碼
             line_bot_api.reply_message(
                 event.reply_token,
-                TemplateSendMessage(
-                    alt_text='請輸入您的校務系統帳號和密碼',
-                    template=ButtonsTemplate(
-                        title='登入校務系統',
-                        text='請輸入您的校務系統帳號和密碼',
-                        actions=[
-                            MessageTemplateAction(label='輸入帳號密碼', text='輸入帳號密碼')
-                        ]
-                    )
-                )
+                TextSendMessage(text="請輸入您的校務系統帳號和密碼，以空格分隔：")
             )
-        if message_text.count(" ") == 1:  # 缩进与前面的 `else` 保持一致
-            # 處理帳號和密碼輸入
-            account, password = message_text.split(" ")
-            user_data[user_id] = {"account": account, "password": password}
+    elif message_text.count(" ") == 1:
+        # 處理帳號和密碼輸入
+        account, password = message_text.split(" ")
+        user_data[user_id] = {"account": account, "password": password}
 
-            # 要求使用者輸入验证码
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="請輸入您看到的驗證碼:")
-            )
-        if user_id in user_data:  # 缩进与前面的 `elif` 保持一致
-            if 'captcha_code' in user_data[user_id]:
-                captcha_code = user_data[user_id]['captcha_code']
-                # 使用帳號密碼登入校務系統
-                login_url = "https://eap10.nuu.edu.tw/Login.aspx?logintype=S"
-                login_data = {
-                    "txtAccount": user_data[user_id]["account"],
-                    "txtPassword": user_data[user_id]["password"],
-                    "txtVerifyCode": captcha_code
-                }
-                try:
-                    login_response = requests.post(login_url, data=login_data)
-                    if login_response.status_code == 200:
-                        # 登入成功，處理後續操作
-                        print("登入成功！")
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            TextSendMessage(text="登入成功！")
-                        )
-                    else:
-                        # 登入失敗，處理後續操作
-                        print("登入失敗！")
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            TextSendMessage(text="登入失敗，請檢查您的帳號密碼或验证码。")
-                        )
-                except Exception as e:
-                    print(f"登入錯誤: {e}")
-                    line_bot_api.reply_message(
-                        event.reply_token,
-                        TextSendMessage(text="登入錯誤，請稍后再試。")
-                    )
-            else:
+        # 要求使用者輸入驗證碼
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="請輸入您看到的驗證碼:")
+        )
+    elif user_id in user_data and 'captcha_code' in user_data[user_id]:
+        captcha_code = user_data[user_id]['captcha_code']
+        # 使用帳號密碼登入校務系統
+        login_url = "https://eap10.nuu.edu.tw/Login.aspx?logintype=S"
+        login_data = {
+            "txtAccount": user_data[user_id]["account"],
+            "txtPassword": user_data[user_id]["password"],
+            "txtVerifyCode": captcha_code
+        }
+        try:
+            login_response = requests.post(login_url, data=login_data)
+            if login_response.status_code == 200:
+                # 登入成功，處理後續操作
+                print("登入成功！")
                 line_bot_api.reply_message(
                     event.reply_token,
-                    TextSendMessage(text="請輸入您看到的驗證碼:")
+                    TextSendMessage(text="登入成功！")
                 )
-        else:
-            # 处理其他情况
-            print("其他情况")
+            else:
+                # 登入失敗，處理後續操作
+                print("登入失敗！")
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="登入失敗，請檢查您的帳號密碼或验证码。")
+                )
+        except Exception as e:
+            print(f"登入錯誤: {e}")
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text="請輸入 \"登入\" 開始登入校務系統。")
+                TextSendMessage(text="登入錯誤，請稍后再試。")
             )
-
     # Skill 2: 查詢課表
     elif message_text == "查詢課表":
         # 取得使用者帳號和密碼
@@ -302,6 +278,11 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="以下是可使用的指令：\n1. 時刻表\n2. 歷年成績查詢\n3. 查詢課表\n4. 登入")
+        )
+    else:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="請輸入正確的指令。")
         )
 
 if __name__ == "__main__":
